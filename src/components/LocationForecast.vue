@@ -83,11 +83,12 @@ export default {
     computed: {
         chartLabels: function () {
             return this.forecast.hourly
+                .slice(0, 24)
                 .map(hour => (new Date(hour.dt * 1000)))
                 .map(datetime => datetime.toTimeString().substring(0, 5));
         },
         chartData: function () {
-            return this.forecast.hourly.map(hour => hour.temp);
+            return this.forecast.hourly.slice(0, 24).map(hour => hour.temp);
         },
         daySummaries: function () {
             return this.forecast.daily.map(day => ({

@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <h1 class="app_title">OpenWeather API Search & Forecast</h1>
+        <h1 class="app_title">OpenWeatherMap API Search & Forecast</h1>
         <form
             class="search-form"
             @submit.prevent="searchLocation(locationName)"
@@ -50,6 +50,8 @@ export default {
     },
     methods: {
         searchLocation: function (locationName) {
+            this.forecast = undefined;
+            this.locationResults = [];
             fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${locationName}&limit=3&appid=${process.env.VUE_APP_API_KEY}`)
                 .then((response) => response.json())
                 .then((searchResults) => {
@@ -57,6 +59,7 @@ export default {
                 });
         },
         loadForecast: function ({lat, lon}) {
+            this.forecast = undefined;
             this.locationResults = this.locationResults.filter(location => location.lon === lon && location.lat === lat);
             fetch(`http://openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.VUE_APP_ONECALL_KEY}`)
                 .then((response) => response.json())
