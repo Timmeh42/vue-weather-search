@@ -14,37 +14,34 @@
                 </tr>
             </thead>
             <tbody>
-                <tr
+                <location-result
                     v-for="location of locationResults"
-                    :key="`${location.lon},${location.lat}`"
-                >
-                    <td>{{ countries[location.country].emoji }}</td>
-                    <td><button @click="loadForecast({lat: location.lat, lon: location.lon})">{{ location.name }}</button></td>
-                    <td>{{ location.state }}</td>
-                    <td>{{ countries[location.country].name }}</td>
-                </tr>
+                    :key="`${location.lat},${location.lon}`"
+                    :location="location"
+                    @loadForecast="loadForecast"
+                />
             </tbody>
         </table>
-        <div v-if="forecastResult">
-            <img :src="`http://openweathermap.org/img/wn/${forecastResult.current.weather[0].icon}@2x.png`" />
-            Temperature: {{ forecastResult.current.main.temp }}c
-            Humidity: {{ forecastResult.current.main.humidity }}%
-            Wind Speed: {{ forecastResult.current.wind.speed }}m/s
-            Cloud Cover: {{ forecastResult.current.clouds.all }}%
-        </div>
+        <location-forecast v-if="forecast" :forecast="forecast" />
     </div>
 </template>
 
 <script>
 import { countries } from 'country-data';
+import LocationForecast from './components/LocationForecast.vue';
+import LocationResult from './components/LocationResult.vue';
 
 export default {
     name: 'App',
+    components: {
+        LocationForecast,
+        LocationResult,
+    },
     data: function () {
         return {
             locationName: '',
             locationResults: [],
-            forecastResult: undefined,
+            forecast: undefined,
             countries,
         }
     },
@@ -56,17 +53,12 @@ export default {
                     this.locationResults = searchResults;
                 });
         },
-        loadForecast: function ({lon, lat}) {
-            Promise.all([
-                    fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.VUE_APP_API_KEY}`).then((res) => res.json()),
-                    fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.VUE_APP_API_KEY}`).then((res) => res.json()),
-                ])
-                .then((responses) => ({
-                    forecast: responses[0],
-                    current: responses[1],
-                }))
-                .then((res) => {
-                    this.forecastResult = res;
+        loadForecast: function ({lat, lon}) {
+            this.locationResults = this.locationResults.filter(location => location.lon === lon && location.lat === lat);
+            fetch(`http://openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.VUE_APP_ONECALL_KEY}`)
+                .then((response) => response.json())
+                .then((forecastResult) => {
+                    this.forecast = forecastResult;
                 });
         }
     }
