@@ -1,28 +1,31 @@
 <template>
     <div id="app">
-        <form @submit.prevent="searchLocation(locationName)">
-            <input type="search" v-model="locationName">
-            <button>Search</button>
+        <h1 class="app_title">OpenWeather API Search & Forecast</h1>
+        <form
+            class="search-form"
+            @submit.prevent="searchLocation(locationName)"
+        >
+            <input
+                class="search-form_input"
+                type="search"
+                v-model="locationName"
+                placeholder="Search by place name"
+            >
+            <button class="search-form_button">Search</button>
         </form>
-        <table v-if="locationResults.length">
-            <thead>
-                <tr>
-                    <th>Flag</th>
-                    <th>Place</th>
-                    <th>State</th>
-                    <th>Country</th>
-                </tr>
-            </thead>
-            <tbody>
-                <location-result
-                    v-for="location of locationResults"
-                    :key="`${location.lat},${location.lon}`"
-                    :location="location"
-                    @loadForecast="loadForecast"
-                />
-            </tbody>
-        </table>
-        <location-forecast v-if="forecast" :forecast="forecast" />
+        <div v-if="locationResults.length">
+            <location-result
+                v-for="location of locationResults"
+                :key="`${location.lat},${location.lon}`"
+                :location="location"
+                @loadForecast="loadForecast"
+            />
+        </div>
+        <location-forecast
+            v-if="forecast"
+            :forecast="forecast"
+            :location="locationResults[0]"
+        />
     </div>
 </template>
 
@@ -65,5 +68,33 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+#app {
+    max-width: 44rem;
+    margin: auto;
+    padding-top: 4rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.app_title {
+    text-align: center;
+}
+
+.search-form {
+    padding: 1rem 0;
+    text-align: center;
+
+    &_input {
+        border-radius: 0.3rem 0 0 0.3rem;
+        border: 1px solid black;
+        border-right-width: 0;
+        padding: 0.125rem 0.25rem;
+    }
+
+    &_button {
+        border-radius: 0 0.3rem 0.3rem 0;
+        border: 1px solid black;
+        padding: 0.125rem 0.25rem;
+    }
+}
 </style>
